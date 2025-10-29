@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./backend
+    container_name: poke_backend
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./database:/app/database
+    networks:
+      - poke_net
+
+  frontend:
+    build: ./frontend
+    container_name: poke_frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - poke_net
+
+networks:
+  poke_net:
+    driver: bridge
+
