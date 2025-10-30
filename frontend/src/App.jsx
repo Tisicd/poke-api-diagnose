@@ -1,28 +1,36 @@
-import { useState } from "react";
-import { fetchPokemons } from "./api/pokemonApi";
-import PokemonCard from "./components/PokemonCard";
+import { useState, useEffect } from "react";
+import LoginPage from "./components/LoginPage";
+import PokemonDashboard from "./components/PokemonDashboard";
+import { isAuthenticated, login, logout, getUser } from "./services/authService";
 
 function App() {
-  const [pokemons, setPokemons] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
 
-  const handleFetch = async () => {
-    setLoading(true);
-    const data = await fetchPokemons();
-    setPokemons(data);
-    setLoading(false);
+  useEffect(() => {
+    if (isAuthenticated()) {
+      setAuthenticated(true);
+      setUser(getUser());
+    }
+  }, []);
+
+  const handleLogin = async (username, password) => {
+    const response = await login(username, password);
+    setAuthenticated(true);
+    setUser(response.user);
   };
 
-  return (
-    <div style={{ padding: 40, fontFamily: "sans-serif" }}>
-      <h1>⚡ Poke List Viewer</h1>
-      <button onClick={handleFetch}>Obtener Pokémon</button>
-      {loading && <p>Cargando...</p>}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, 180px)", gap: 20, marginTop: 30 }}>
-        {pokemons.map((p) => <PokemonCard key={p.name} {...p} />)}
-      </div>
-    </div>
-  );
+  const handleLogout = () => {
+    logout();
+    setAuthenticated(false);
+    setUser(null);
+  };
+
+  if (!authenticated) {
+    return <LoginPage onLogin={handleLogin} />;
+  }
+
+  return <PokemonDashboard user={user} onLogout={handleLogout} />;
 }
 
 export default App;
