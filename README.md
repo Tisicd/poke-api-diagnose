@@ -128,3 +128,64 @@ Al iniciar la aplicación por primera vez, se crea automáticamente un usuario d
 - **Usuario**: `admin`
 - **Contraseña**: `admin123`
 
+## 🐳 Despliegue con Docker Hub
+
+### Usar imágenes pre-construidas
+
+Las imágenes Docker están disponibles en Docker Hub. Para usarlas:
+
+1. Crea un archivo `.env.prod`:
+```env
+DOCKER_HUB_USERNAME=tu-usuario-dockerhub
+DB_USER=postgres
+DB_PASSWORD=tu-password-seguro
+DB_NAME=pokemons
+JWT_SECRET=tu-secreto-jwt-super-seguro
+BACKEND_PORT=4000
+FRONTEND_PORT=5173
+DB_PORT=5432
+```
+
+2. Ejecuta con docker-compose de producción:
+```bash
+# Cargar variables de entorno
+export $(cat .env.prod | xargs)
+
+# Ejecutar
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+### Imágenes disponibles
+
+- `tu-usuario/poke-api-backend:latest`
+- `tu-usuario/poke-api-frontend:latest`
+
+## 🔄 CI/CD con GitHub Actions
+
+El proyecto incluye GitHub Actions que automáticamente:
+
+- ✅ Construyen las imágenes Docker en cada push a `main`/`master`
+- ✅ Publican las imágenes en Docker Hub
+- ✅ Usan caché para builds más rápidos
+- ✅ Soportan tags semánticos (v1.0.0)
+
+### Configuración
+
+1. **Configura secrets en GitHub:**
+   - `DOCKER_HUB_USERNAME`: Tu usuario de Docker Hub
+   - `DOCKER_HUB_TOKEN`: Access token de Docker Hub
+
+2. **Los workflows se ejecutan automáticamente** en cada push
+
+Ver `GITHUB_SETUP.md` para instrucciones detalladas.
+
+## 📝 Registro de Usuarios
+
+La aplicación ahora incluye funcionalidad de registro:
+
+- ✅ Los usuarios pueden crear cuentas nuevas
+- ✅ Validación de usuario único
+- ✅ Validación de contraseñas (mínimo 6 caracteres)
+- ✅ Autenticación automática después del registro
+- ✅ Cada usuario tiene su propio historial de búsquedas
+

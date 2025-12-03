@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import LoginPage from "./components/LoginPage";
+import RegisterPage from "./components/RegisterPage";
 import PokemonDashboard from "./components/PokemonDashboard";
-import { isAuthenticated, login, logout, getUser } from "./services/authService";
+import { isAuthenticated, login, register, logout, getUser } from "./services/authService";
 
 function App() {
   const [authenticated, setAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [showRegister, setShowRegister] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated()) {
@@ -20,14 +22,34 @@ function App() {
     setUser(response.user);
   };
 
+  const handleRegister = async (username, password) => {
+    const response = await register(username, password);
+    setAuthenticated(true);
+    setUser(response.user);
+  };
+
   const handleLogout = () => {
     logout();
     setAuthenticated(false);
     setUser(null);
+    setShowRegister(false);
   };
 
   if (!authenticated) {
-    return <LoginPage onLogin={handleLogin} />;
+    if (showRegister) {
+      return (
+        <RegisterPage
+          onRegister={handleRegister}
+          onSwitchToLogin={() => setShowRegister(false)}
+        />
+      );
+    }
+    return (
+      <LoginPage
+        onLogin={handleLogin}
+        onSwitchToRegister={() => setShowRegister(true)}
+      />
+    );
   }
 
   return <PokemonDashboard user={user} onLogout={handleLogout} />;

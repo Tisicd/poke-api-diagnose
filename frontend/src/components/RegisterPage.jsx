@@ -1,20 +1,38 @@
 import { useState } from "react";
 
-export default function LoginPage({ onLogin, onSwitchToRegister }) {
+export default function RegisterPage({ onRegister, onSwitchToLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    // Validaciones del cliente
+    if (username.length < 3) {
+      setError("El usuario debe tener al menos 3 caracteres");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Las contraseñas no coinciden");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await onLogin(username, password);
+      await onRegister(username, password);
     } catch (err) {
-      setError(err.response?.data?.error || "Error al iniciar sesión");
+      setError(err.response?.data?.error || "Error al registrar usuario");
     } finally {
       setLoading(false);
     }
@@ -42,7 +60,7 @@ export default function LoginPage({ onLogin, onSwitchToRegister }) {
         }}
       >
         <h1 style={{ textAlign: "center", marginBottom: "30px", color: "#333" }}>
-          🔐 Iniciar Sesión
+          ✨ Crear Cuenta
         </h1>
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: "20px" }}>
@@ -61,6 +79,7 @@ export default function LoginPage({ onLogin, onSwitchToRegister }) {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
+              minLength={3}
               style={{
                 width: "100%",
                 padding: "12px",
@@ -69,7 +88,7 @@ export default function LoginPage({ onLogin, onSwitchToRegister }) {
                 fontSize: "16px",
                 boxSizing: "border-box",
               }}
-              placeholder="Ingresa tu usuario"
+              placeholder="Mínimo 3 caracteres"
             />
           </div>
           <div style={{ marginBottom: "20px" }}>
@@ -88,6 +107,7 @@ export default function LoginPage({ onLogin, onSwitchToRegister }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
               style={{
                 width: "100%",
                 padding: "12px",
@@ -96,7 +116,35 @@ export default function LoginPage({ onLogin, onSwitchToRegister }) {
                 fontSize: "16px",
                 boxSizing: "border-box",
               }}
-              placeholder="Ingresa tu contraseña"
+              placeholder="Mínimo 6 caracteres"
+            />
+          </div>
+          <div style={{ marginBottom: "20px" }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "8px",
+                fontWeight: "bold",
+                color: "#555",
+              }}
+            >
+              Confirmar Contraseña
+            </label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              minLength={6}
+              style={{
+                width: "100%",
+                padding: "12px",
+                border: "1px solid #ddd",
+                borderRadius: "6px",
+                fontSize: "16px",
+                boxSizing: "border-box",
+              }}
+              placeholder="Repite tu contraseña"
             />
           </div>
           {error && (
@@ -128,7 +176,7 @@ export default function LoginPage({ onLogin, onSwitchToRegister }) {
               cursor: loading ? "not-allowed" : "pointer",
             }}
           >
-            {loading ? "Cargando..." : "Iniciar Sesión"}
+            {loading ? "Registrando..." : "Registrarse"}
           </button>
           <div
             style={{
@@ -136,32 +184,20 @@ export default function LoginPage({ onLogin, onSwitchToRegister }) {
               textAlign: "center",
             }}
           >
-            {onSwitchToRegister && (
-              <button
-                type="button"
-                onClick={onSwitchToRegister}
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "#667eea",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  textDecoration: "underline",
-                  marginBottom: "10px",
-                }}
-              >
-                ¿No tienes cuenta? Regístrate
-              </button>
-            )}
-            <p
+            <button
+              type="button"
+              onClick={onSwitchToLogin}
               style={{
-                fontSize: "12px",
-                color: "#777",
-                margin: 0,
+                background: "none",
+                border: "none",
+                color: "#667eea",
+                cursor: "pointer",
+                fontSize: "14px",
+                textDecoration: "underline",
               }}
             >
-              Usuario de prueba: admin / admin123
-            </p>
+              ¿Ya tienes cuenta? Inicia sesión
+            </button>
           </div>
         </form>
       </div>

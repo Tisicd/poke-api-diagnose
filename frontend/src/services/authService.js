@@ -1,7 +1,14 @@
-import { login as loginApi } from "../api/authApi.js";
+import { login as loginApi, register as registerApi } from "../api/authApi.js";
 
 const TOKEN_KEY = "poke_auth_token";
 const USER_KEY = "poke_user";
+
+export const register = async (username, password) => {
+  const response = await registerApi(username, password);
+  localStorage.setItem(TOKEN_KEY, response.token);
+  localStorage.setItem(USER_KEY, JSON.stringify(response.user));
+  return response;
+};
 
 export const login = async (username, password) => {
   const response = await loginApi(username, password);

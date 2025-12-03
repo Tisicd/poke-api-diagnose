@@ -1,0 +1,58 @@
+version: "3.9"
+
+# Docker Compose para producción usando imágenes de Docker Hub
+# Uso: docker-compose -f docker-compose.prod.yml up
+
+services:
+  database:
+    image: postgres:15-alpine
+    container_name: poke_database
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-pokemons}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - poke_net
+    restart: unless-stopped
+
+  backend:
+    image: ${DOCKER_HUB_USERNAME:-tu-usuario}/poke-api-backend:latest
+    container_name: poke_backend
+    ports:
+      - "${BACKEND_PORT:-4000}:4000"
+    environment:
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: ${DB_NAME:-pokemons}
+      JWT_SECRET: ${JWT_SECRET:-tu_secreto_super_seguro_cambiar_en_produccion}
+      PORT: 4000
+    depends_on:
+      - database
+    networks:
+      - poke_net
+    restart: unless-stopped
+
+  frontend:
+    image: ${DOCKER_HUB_USERNAME:-tu-usuario}/poke-api-frontend:latest
+    container_name: poke_frontend
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    depends_on:
+      - backend
+    networks:
+      - poke_net
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  poke_net:
+    driver: bridge
+

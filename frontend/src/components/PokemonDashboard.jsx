@@ -38,7 +38,7 @@ export default function PokemonDashboard({ user, onLogout }) {
       setLoadingList(true);
       setErrorList("");
       try {
-        const res = await fetchPaginatedPokemons(page, 10);
+        const res = await fetchPaginatedPokemons(page, 12);
         setItems(res.items);
         setTotalPages(res.totalPages);
       } catch (err) {
@@ -94,7 +94,7 @@ export default function PokemonDashboard({ user, onLogout }) {
   return (
     <div
       style={{
-        padding: "40px",
+        padding: "40px 20px",
         fontFamily: "sans-serif",
         background: "#f5f5f5",
         minHeight: "100vh",
@@ -185,9 +185,38 @@ export default function PokemonDashboard({ user, onLogout }) {
       )}
 
       {/* Lista paginada */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, 280px)", gap: 20 }}>
+      <style>
+        {`
+          @media (max-width: 768px) {
+            .pokemon-grid {
+              grid-template-columns: repeat(1, 1fr) !important;
+            }
+          }
+          @media (min-width: 769px) and (max-width: 1024px) {
+            .pokemon-grid {
+              grid-template-columns: repeat(2, 1fr) !important;
+            }
+          }
+          @media (min-width: 1025px) {
+            .pokemon-grid {
+              grid-template-columns: repeat(3, 1fr) !important;
+            }
+          }
+        `}
+      </style>
+      <div
+        className="pokemon-grid"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: "20px",
+          width: "100%",
+          maxWidth: "1200px",
+          margin: "0 auto",
+        }}
+      >
         {items.map((it) => (
-          <div key={it.name} ref={registerRef(it.name)}>
+          <div key={it.name} ref={registerRef(it.name)} style={{ display: "flex", flexDirection: "column" }}>
             <PokemonCard {...it} />
             {/* Si coincide con resultado buscado, botón para ver en página */}
             {pokemon && pokemon.name === it.name && (
